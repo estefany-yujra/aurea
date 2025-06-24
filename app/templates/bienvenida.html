@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="text-center mt-5 fade-in">
+  <img src="{{ url_for('static', filename='img/logo_gatito.png') }}" width="150" class="mb-4">
+  <h1 class="aurea-title">Bienvenido a AUREA</h1>
+  <p class="lead text-dark">Tu espacio para brillar, motivarte y lograr cada paso de tu proyecto.</p>
+  <a href="{{ url_for('auth.login') }}" class="btn btn-aurea btn-lg mt-4">Comenzar</a>
+</div>
+{% endblock %}
+

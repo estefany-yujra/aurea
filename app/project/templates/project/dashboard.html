@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+  <h2 class="aurea-title mb-4">🌟 Mis Proyectos</h2>
+  <div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <a href="{{ url_for('project.crear_proyecto') }}" class="btn btn-aurea me-2">➕ Crear proyecto</a>
+    <a href="{{ url_for('project.linea_tiempo') }}" class="btn btn-lila-dorado">📈 Ver línea de tiempo</a>
+  </div>
+</div>
+  <div class="row">
+    {% for p in proyectos %}
+    <div class="col-md-4 mb-4 fade-in-card">
+      <div class="card shadow-sm h-100 border-0" style="border-radius: 16px;">
+        <div class="card-body" style="background-color: #FDFBFF;">
+          <h5 class="card-title" style="color: #A678F0;">{{ p.nombre }}</h5>
+          <p class="card-text">{{ p.descripcion }}</p>
+          <a href="{{ url_for('project.ver_proyecto', id=p.id_proyecto) }}" class="btn btn-aurea btn-sm mt-2">Ver más</a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

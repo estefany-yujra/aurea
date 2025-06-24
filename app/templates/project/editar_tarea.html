@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="form-card">
+  <h3 class="aurea-title">Editar Tarea</h3>
+  <form method="POST">
+    {{ form.hidden_tag() }}
+    <div class="mb-3">
+      {{ form.nombre.label }} {{ form.nombre(class="form-control") }}
+    </div>
+    <button class="btn btn-aurea">Guardar cambios</button>
+  </form>
+</div>
+{% endblock %}

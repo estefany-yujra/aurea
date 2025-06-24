@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Notificaciones</h2>
+    
+    <div class="list-group mt-3">
+        {% for notif in notificaciones %}
+        <a href="{{ url_for('notifications.marcar_leida', id=notif.id_notificacion) }}"
+           class="list-group-item list-group-item-action {% if notif.leida %}list-group-item-light{% else %}list-group-item-warning{% endif %}">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <p class="mb-1">{{ notif.mensaje }}</p>
+                    <small class="text-muted">{{ notif.fecha_creacion.strftime('%d/%m/%Y %H:%M') }}</small>
+                </div>
+                {% if not notif.leida %}
+                <span class="badge badge-primary">Nueva</span>
+                {% endif %}
+            </div>
+        </a>
+        {% else %}
+        <div class="alert alert-info">No tienes notificaciones</div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

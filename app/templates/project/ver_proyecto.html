@@ -1,0 +1,276 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+  <h2 class="aurea-title">{{ proyecto.nombre }}</h2>
+  <div class="row">
+    <!-- Columna izquierda -->
+    <div class="col-md-8">
+      <div class="card shadow-sm mb-4">
+        <div class="card-body">
+          <p class="card-text">{{ proyecto.descripcion }}</p>
+          <div class="d-flex justify-content-between align-items-center">
+            <span class="badge bg-purple">{{ proyecto.categoria.nombre }}</span>
+            <div class="progress flex-grow-1 mx-3" style="height: 20px;">
+              <div class="progress-bar bg-warning" style="width: {{ proyecto.progreso_calculado }}%">
+                {{ proyecto.progreso_calculado }}%
+              </div>
+            </div>
+          </div>
+        </div>
+      <!-- Lista de colaboradores -->
+      <div class="border-top pt-3">
+  <h6 class="text-muted">👥 Colaboradores del proyecto</h6>
+  <ul class="list-group list-group-flush">
+    {% for colab in colaboradores %}
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        {{ colab.nombre }} ({{ colab.email }})
+        <span class="badge bg-secondary">{{ colab.rol|capitalize }}</span>
+        <form method="POST" action="{{ url_for('project.eliminar_colaborador', id=colab.id) }}" class="ms-2">
+          <button type="submit" class="btn btn-sm btn-outline-danger">
+            <i class="bi bi-trash"></i>
+          </button>
+        </form>
+      </li>
+    {% else %}
+      <li class="list-group-item text-muted">No hay colaboradores aún</li>
+    {% endfor %}
+  </ul>
+</div>
+      </div>
+
+      <!-- Tareas -->
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="mb-0">📋 Tareas del proyecto</h5>
+      <div>
+      <button onclick="mostrarFormulario()" class="btn btn-aurea me-2">
+        <i class="bi bi-plus-circle"></i> Nueva tarea
+      </button>
+      <button class="btn btn-pastel-lila" data-bs-toggle="modal" data-bs-target="#modalInvitar">
+        <i class="bi bi-person-plus"></i> Añadir colaborador
+      </button>
+      </div>
+      </div>
+
+      <!-- Modal para invitar colaborador -->
+<div class="modal fade" id="modalInvitar" tabindex="-1" aria-labelledby="modalInvitarLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form method="POST" action="{{ url_for('project.invitar_colaborador', id=proyecto.id_proyecto) }}">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalInvitarLabel">Invitar Colaborador</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <label for="email">Correo del usuario:</label>
+          <input type="email" name="email" id="email" class="form-control" required placeholder="usuario@ejemplo.com">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-aurea">Invitar</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+      <!-- Formulario de tarea (oculto inicialmente) -->
+      <div id="form-tarea" class="card mb-4" style="display: none;">
+        <div class="card-body">
+          <form method="POST">
+            {{ form.hidden_tag() }}
+            <div class="mb-3">
+              {{ form.nombre.label(class="form-label") }}
+              {{ form.nombre(class="form-control", placeholder="Nombre de la tarea") }}
+            </div>
+            <div class="mb-3">
+              {{ form.prioridad.label(class="form-label") }}
+              {{ form.prioridad(class="form-select") }}
+            </div>
+            <button type="submit" class="btn btn-aurea">Guardar</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Lista de tareas -->
+      {% for tarea in tareas %}
+      <div class="card mb-3 shadow-sm fade-in-card">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <h5 class="mb-1 {% if tarea.completado %}text-muted text-decoration-line-through{% endif %}">
+                {{ tarea.nombre }}
+                <span class="badge ms-2 
+                  {% if tarea.prioridad.nombre == 'Alta' %}bg-danger
+                  {% elif tarea.prioridad.nombre == 'Media' %}bg-warning
+                  {% else %}bg-info{% endif %}">
+                  {{ tarea.prioridad.nombre }}
+                </span>
+              </h5>
+              {% if tarea.descripcion %}
+              <p class="mb-2 text-muted"><small>{{ tarea.descripcion }}</small></p>
+              {% endif %}
+            </div>
+            
+            <!-- Botones de acción -->
+            <div class="btn-group">
+              <a href="{{ url_for('project.completar_tarea', id_tarea=tarea.id_tarea) }}" 
+                 class="btn btn-sm btn-pastel-verde" title="Completar">
+                <i class="bi bi-check"></i>
+              </a>
+              <a href="{{ url_for('project.editar_tarea', id_tarea=tarea.id_tarea) }}" 
+                 class="btn btn-sm btn-pastel-rosa" title="Editar">
+                <i class="bi bi-pencil"></i>
+              </a>
+              <a href="{{ url_for('project.eliminar_tarea', id_tarea=tarea.id_tarea) }}" 
+                 class="btn btn-sm btn-pastel-lila" title="Eliminar">
+                <i class="bi bi-trash"></i>
+              </a>
+              <button class="btn btn-sm btn-pastel-celeste" 
+                      data-bs-toggle="collapse" 
+                      data-bs-target="#comentarios-{{ tarea.id_tarea }}"
+                      title="Comentarios">
+                <i class="bi bi-chat"></i> ({{ tarea.comentarios|length }})
+              </button>
+            </div>
+          </div>
+
+          <!-- Sección de comentarios (colapsable) -->
+          <div class="collapse mt-3" id="comentarios-{{ tarea.id_tarea }}">
+            <div class="border-top pt-3">
+              <!-- Formulario de comentario -->
+              <form method="POST" action="{{ url_for('project.agregar_comentario', id_tarea=tarea.id_tarea) }}"
+                    class="input-group mb-3">
+                <input type="text" name="texto" class="form-control form-control-sm" 
+                       placeholder="Escribe un comentario..." required>
+                <button type="submit" class="btn btn-sm btn-aurea">
+                  <i class="bi bi-send"></i>
+                </button>
+              </form>
+              
+              <!-- Lista de comentarios -->
+              {% for comentario in tarea.comentarios|sort(attribute='fecha', reverse=true) %}
+              <div class="card mb-2 card-comentario">
+                <div class="card-body p-2">
+                  <div class="d-flex justify-content-between">
+                    <strong class="text-primary">{{ comentario.usuario.nombre }}</strong>
+                    <small class="text-muted">{{ comentario.fecha.strftime('%d/%m/%Y %H:%M') }}</small>
+                  </div>
+                  <p class="mb-0 mt-1">{{ comentario.texto }}</p>
+                </div>
+              </div>
+              {% else %}
+              <p class="text-muted text-center py-2">No hay comentarios aún</p>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+      {% else %}
+      <div class="alert alert-info">No hay tareas en este proyecto</div>
+      {% endfor %}
+    </div>
+
+    <!-- Columna derecha: Gráficos -->
+    <div class="col-md-4">
+      <div class="card shadow-sm mb-4">
+        <div class="card-body">
+          <h5 class="text-center mb-3">📊 Progreso</h5>
+          <canvas id="graficoProgreso"></canvas>
+        </div>
+      </div>
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h5 class="text-center mb-3">📈 Prioridades</h5>
+          <canvas id="graficoPrioridades"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  // Mostrar/ocultar formulario
+  function mostrarFormulario() {
+    const form = document.getElementById('form-tarea');
+    form.style.display = form.style.display === 'none' ? 'block' : 'none';
+  }
+
+  // Gráfico de progreso
+  const ctxProgreso = document.getElementById('graficoProgreso').getContext('2d');
+  new Chart(ctxProgreso, {
+    type: 'doughnut',
+    data: {
+      labels: ['Completadas', 'Pendientes'],
+      datasets: [{
+        data: [{{ completadas }}, {{ pendientes }}],
+        backgroundColor: ['#BBF7D0', '#FBCFE8'],
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: 'bottom'
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              const total = {{ completadas + pendientes }};
+              const value = context.raw;
+              const percentage = Math.round((value / total) * 100);
+              return `${context.label}: ${percentage}% (${value})`;
+            }
+          }
+        }
+      }
+    }
+  });
+
+  // Gráfico de prioridades
+  const ctxPrioridades = document.getElementById('graficoPrioridades').getContext('2d');
+  new Chart(ctxPrioridades, {
+    type: 'bar',
+    data: {
+      labels: {{ etiquetas|tojson|safe }},
+      datasets: [{
+        label: 'Tareas',
+        data: {{ valores|tojson|safe }},
+        backgroundColor: '#A678F0',
+        borderColor: '#FFD700',
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+</script>
+
+<style>
+  .card-comentario {
+    border-left: 3px solid #A678F0;
+    transition: transform 0.3s;
+  }
+  .card-comentario:hover {
+    transform: translateX(5px);
+  }
+  .fade-in-card {
+    animation: fadeIn 0.5s ease-out;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .bg-purple {
+    background-color: #A678F0;
+  }
+</style>
+{% endblock %}

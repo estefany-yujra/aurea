@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+    <h2 class="aurea-title">Panel de Administración</h2>
+    
+    <!-- Resumen Global -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h5>📊 Estadísticas</h5>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="alert alert-primary">
+                        <strong>Usuarios:</strong> {{ usuarios|length }}
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="alert alert-warning">
+                        <strong>Proyectos:</strong> {{ total_proyectos }}
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="alert alert-info">
+                        <strong>Tareas:</strong> {{ total_tareas }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Listado de Usuarios y sus Proyectos -->
+    {% for usuario in usuarios %}
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-light">
+            <h5>👤 {{ usuario.nombre }} <small class="text-muted">{{ usuario.email }}</small></h5>
+        </div>
+        <div class="card-body">
+            {% if usuario.proyectos %}
+            <div class="row">
+                {% for proyecto in usuario.proyectos %}
+                <div class="col-md-6 mb-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6>{{ proyecto.nombre }}</h6>
+                            <p>{{ proyecto.descripcion }}</p>
+                            <div class="progress mb-2">
+                                <div class="progress-bar" style="width: {{ proyecto.progreso_calculado }}%">
+                                    {{ proyecto.progreso_calculado }}%
+                                </div>
+                            </div>
+                            <a href="{{ url_for('project.ver_proyecto', id=proyecto.id_proyecto) }}" 
+                               class="btn btn-sm btn-aurea">Ver Detalles</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-muted">Este usuario no tiene proyectos aún.</p>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

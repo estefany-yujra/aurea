@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Reporte de Estadísticas AUREA</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      font-size: 14px;
+      color: #333;
+      padding: 30px;
+      background-color: #fff;
+    }
+
+    h2 {
+      color: #A78BFA;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    p {
+      margin: 4px 0;
+    }
+
+    .info {
+      margin-bottom: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 30px;
+    }
+
+    th {
+      background-color: #E9D5FF;
+      color: #4C1D95;
+      padding: 8px;
+      text-align: left;
+    }
+
+    td {
+      padding: 8px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    tr:nth-child(even) {
+      background-color: #F3E8FF;
+    }
+
+    .footer {
+      font-size: 11px;
+      color: #888;
+      text-align: center;
+      margin-top: 40px;
+      border-top: 1px solid #ddd;
+      padding-top: 10px;
+    }
+
+    .highlight {
+      background-color: #FDE68A;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>📊 Reporte de Estadísticas Personales</h2>
+
+  <div class="info">
+    <p><strong>Usuario:</strong> {{ usuario.nombre }}</p>
+    <p><strong>Fecha de generación:</strong> {{ fecha }}</p>
+  </div>
+
+  <table>
+    <tr>
+      <th>Indicador</th>
+      <th>Valor</th>
+    </tr>
+    <tr>
+      <td>Total de Proyectos</td>
+      <td>{{ total_proyectos }}</td>
+    </tr>
+    <tr>
+      <td>Total de Tareas</td>
+      <td>{{ total_tareas }}</td>
+    </tr>
+    <tr>
+      <td>Tareas Completadas</td>
+      <td>{{ completadas }}</td>
+    </tr>
+    <tr>
+      <td>Tareas Pendientes</td>
+      <td>{{ pendientes }}</td>
+    </tr>
+    <tr class="highlight">
+      <td>Avance Promedio</td>
+      <td>{{ promedio }}%</td>
+    </tr>
+  </table>
+  <h3 style="color:#A855F7;">📈 Diagrama de Pareto</h3>
+    <p>Visualiza cómo se distribuyen tus tareas según la prioridad.</p>
+        <img src="data:image/png;base64,{{ grafico_pareto }}" style="width:100%; max-width:700px; margin-top:10px;">
+
+  <p><em>💡 Sigue así, ¡has completado el {{ promedio }}% de tus tareas! ¡Buen trabajo!</em></p>
+
+  <div class="footer">
+    Este reporte fue generado automáticamente por el sistema <strong>AUREA</strong> - Herramienta de Seguimiento de Proyectos.<br>
+    Gracias por confiar en nosotros 💜
+  </div>
+
+</body>
+</html>

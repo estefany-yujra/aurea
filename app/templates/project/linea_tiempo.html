@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+  <h2 class="aurea-title mb-4 text-center">📅 Línea de Tiempo de Proyectos</h2>
+
+  <canvas id="graficoLinea"></canvas>
+
+  <div class="text-end mt-3">
+    <button id="descargarGrafico" class="btn btn-lila-dorado">⬇ Descargar gráfico</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  const proyectos = {{ proyectos|tojson }};
+  const labels = proyectos.map(p => p.nombre);
+  const avances = proyectos.map(p => p.avance);
+
+  const colores = avances.map(a => {
+    if (a <= 25) return '#F28B82';
+    else if (a <= 75) return '#FDD663';
+    else return '#81C995';
+  });
+
+  const ctx = document.getElementById('graficoLinea').getContext('2d');
+  const grafico = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Progreso (%)',
+        data: avances,
+        fill: false,
+        borderColor: '#CBA1F9',
+        backgroundColor: colores,
+        tension: 0.4,
+        pointBackgroundColor: colores,
+        pointBorderColor: '#FFD700',
+        pointRadius: 6,
+        pointHoverRadius: 8
+      }]
+    },
+    options: {
+      animation: {
+        duration: 1000,
+        easing: 'easeOutQuart'
+      },
+      plugins: {
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              return context.label + ': ' + context.formattedValue + '% completado';
+            }
+          }
+        },
+        title: {
+          display: true,
+          text: 'Progreso de proyectos en el tiempo',
+          font: { size: 20 }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          max: 100
+        }
+      }
+    }
+  });
+
+  document.getElementById("descargarGrafico").onclick = function(){
+    const link = document.createElement('a');
+    link.download = 'linea_tiempo.png';
+    link.href = document.getElementById('graficoLinea').toDataURL();
+    link.click();
+  };
+</script>
+{% endblock %}

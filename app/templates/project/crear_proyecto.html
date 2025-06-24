@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="form-card">
+  <h3 class="aurea-title mb-4">✨ Nuevo Proyecto</h3>
+  <form method="POST">
+    {{ form.hidden_tag() }}
+
+    <div class="mb-3">{{ form.nombre.label }} {{ form.nombre(class="form-control") }}</div>
+    <div class="mb-3">{{ form.descripcion.label }} {{ form.descripcion(class="form-control") }}</div>
+    <div class="mb-3">{{ form.estado.label }} {{ form.estado(class="form-select") }}</div>
+    <div class="mb-3">{{ form.prioridad.label }} {{ form.prioridad(class="form-select") }}</div>
+    <div class="mb-3">{{ form.fecha_inicio.label }} {{ form.fecha_inicio(class="form-control") }}</div>
+    <div class="mb-3">{{ form.fecha_fin.label }} {{ form.fecha_fin(class="form-control") }}</div>    
+    <div class="d-grid">
+      {{ form.submit(class="btn btn-aurea") }}
+    </div>
+  </form>
+</div>
+{% endblock %}

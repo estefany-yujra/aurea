@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+  <h2 class="aurea-title text-center mb-4">📊 Estadísticas Individuales</h2>
+
+  <div class="row">
+    <div class="col-md-6">
+      <div class="card p-4 shadow-sm">
+        <h5 class="text-center mb-3">🔍 Resumen</h5>
+        <ul class="list-group">
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            Total de Proyectos:
+            <span class="badge bg-warning rounded-pill">{{ total_proyectos }}</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            Total de Tareas:
+            <span class="badge bg-info rounded-pill">{{ total_tareas }}</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            Tareas Completadas:
+            <span class="badge bg-success rounded-pill">{{ tareas_completadas }}</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            Tareas Pendientes:
+            <span class="badge bg-danger rounded-pill">{{ tareas_pendientes }}</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            Avance Promedio:
+            <span class="badge bg-primary rounded-pill">{{ avance_promedio }}%</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="card p-4 shadow-sm mb-4">
+        <h5 class="text-center mb-3">🎯 Estado de Tareas</h5>
+        <canvas id="graficoTareas"></canvas>
+      </div>
+      <div class="card p-4 shadow-sm">
+        <h5 class="text-center mb-3">📈 Proyectos y Tareas</h5>
+        <canvas id="graficoResumen"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="text-end mt-4">
+    <a href="{{ url_for('project.exportar_estadisticas_pdf') }}" class="btn btn-pastel-lila">
+      <i class="bi bi-download me-1"></i> Descargar PDF
+    </a>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const tareasCompletadas = {{ tareas_completadas | tojson }};
+    const tareasPendientes = {{ tareas_pendientes | tojson }};
+    const totalProyectos = {{ total_proyectos | tojson }};
+    const totalTareas = {{ total_tareas | tojson }};
+    const avancePromedio = {{ avance_promedio | tojson }};
+
+    const ctxTareas = document.getElementById('graficoTareas').getContext('2d');
+    new Chart(ctxTareas, {
+      type: 'doughnut',
+      data: {
+        labels: ['Completadas', 'Pendientes'],
+        datasets: [{
+          data: [tareasCompletadas, tareasPendientes],
+          backgroundColor: ['#BBF7D0', '#FBCFE8'],
+          borderColor: '#fff',
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { position: 'bottom' },
+          tooltip: {
+            callbacks: {
+              label: function (context) {
+                const total = tareasCompletadas + tareasPendientes;
+                const value = context.parsed;
+                const percentage = total ? ((value / total) * 100).toFixed(1) : 0;
+                return `${context.label}: ${percentage}% (${value})`;
+              }
+            }
+          }
+        }
+      }
+    });
+
+    const ctxResumen = document.getElementById('graficoResumen').getContext('2d');
+    new Chart(ctxResumen, {
+      type: 'bar',
+      data: {
+        labels: ['Proyectos', 'Tareas', 'Avance Promedio'],
+        datasets: [{
+          label: 'Cantidad',
+          data: [totalProyectos, totalTareas, avancePromedio],
+          backgroundColor: ['#C4B5FD', '#A5F3FC', '#FFD700'],
+          borderColor: '#EADCF8',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        scales: {
+          y: {
+            beginAtZero: true,
+            max: 100
+          }
+        },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: function (context) {
+                return `${context.label}: ${context.parsed.y}`;
+              }
+            }
+          }
+        }
+      }
+    });
+  });
+</script>
+{% endblock %}
